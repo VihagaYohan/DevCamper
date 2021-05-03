@@ -19,10 +19,7 @@ exports.getBootcamps = async (req, res, next) => {
       msg: bootcamps,
     });
   } catch (error) {
-    res.status(400).json({
-      sucess: false,
-      msg: error,
-    });
+    next(error);
   }
 };
 
@@ -43,10 +40,7 @@ exports.getBootcamp = async (req, res, next) => {
       msg: bootcamp,
     });
   } catch (error) {
-    res.status(400).json({
-      sucess: false,
-      msg: error,
-    });
+    next(error);
   }
 };
 
@@ -54,35 +48,40 @@ exports.getBootcamp = async (req, res, next) => {
 // @route   POST /api/v1/bootcamps
 // @access  private
 exports.createBootcamp = async (req, res, next) => {
-  //const bootcamp = Bootcamp.create(req.body);
-
-  const bootcamp = Bootcamp.create(req.body);
-  console.log(bootcamp);
-  res.status(201).json({
-    sucess: true,
-    msg: bootcamp,
-  });
+  try {
+    const bootcamp = Bootcamp.create(req.body);
+    console.log(bootcamp);
+    res.status(201).json({
+      sucess: true,
+      msg: bootcamp,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 // @desc    update a single bootcamp
 // @route   PUT /api/v1/bootcamps/:id
 // @access  private
 exports.updateBootcamp = async (req, res, next) => {
-  const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-
-  if (!bootcamp)
-    return res.status(404).json({
-      sucess: false,
-      data: "Bootcamp for the given ID was not found",
+  try {
+    const bootcamp = await Bootcamp.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
     });
 
-  res.status(200).json({
-    sucess: true,
-    msg: bootcamp,
-  });
+    if (!bootcamp)
+      return res.status(404).json({
+        sucess: false,
+        data: "Bootcamp for the given ID was not found",
+      });
+    res.status(200).json({
+      sucess: true,
+      msg: bootcamp,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
 // @desc    delete a bootcamp
@@ -103,9 +102,6 @@ exports.deleteBootcamp = async (req, res, next) => {
       msg: bootcamp,
     });
   } catch (error) {
-    res.status(400).json({
-      sucess: false,
-      msg: error,
-    });
+    next(error);
   }
 };
