@@ -6,9 +6,11 @@ dotenv.config({ path: "./config/config.env" });
 
 const app = express();
 
-app.get("/", (req, res) => {
-  res.send("hello, world");
-});
+// route files
+const bootcamps = require('./routes/bootcamps')
+
+// mount route files
+app.use('/api/v1/bootcamps',bootcamps)
 
 const PORT = process.env.PORT || 5000;
 
