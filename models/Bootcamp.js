@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
-const Joi = require('joi')
+const Joi = require("joi");
+const slugify = require("slugify");
 
 const BootcampShema = new mongoose.Schema({
   name: {
@@ -102,14 +103,20 @@ const BootcampShema = new mongoose.Schema({
   },
 });
 
+// mongoose hooks needs to run before model creation
+
+// create bootcamp slug from the name
+BootcampShema.pre("save", function (next) {
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
 const Bootcamp = mongoose.model("Bootcamp", BootcampShema);
 
 // user validation for bootcamp
 const validateBootcamp = (bootcamp) => {
-    const schema = Joi.object({
-      
-    })
-}
+  const schema = Joi.object({});
+};
 
 module.exports = {
   BootcampShema,
