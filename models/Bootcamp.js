@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const Joi = require('joi')
 
 const BootcampShema = new mongoose.Schema({
   name: {
@@ -102,6 +103,13 @@ const BootcampShema = new mongoose.Schema({
 });
 
 const Bootcamp = mongoose.model("Bootcamp", BootcampShema);
+
+// user validation for bootcamp
+const validateBootcamp = (bootcamp) => {
+    const schema = Joi.object({
+      
+    })
+}
 
 module.exports = {
   BootcampShema,
