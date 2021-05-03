@@ -60,7 +60,10 @@ exports.createBootcamp = async (req, res, next) => {
       msg: bootcamp,
     });
   } catch (error) {
-    next(error);
+    res.status(201).json({
+      sucess: true,
+      msg: error,
+    });
   }
 };
 
