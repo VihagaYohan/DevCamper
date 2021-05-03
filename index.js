@@ -8,6 +8,7 @@ const connectDB = require("./config/db");
 
 // import middle-ware
 const logger = require("./middleware/logging");
+const errorHandler = require("./middleware/error");
 
 // load env vars
 dotenv.config({ path: "./config/config.env" });
@@ -30,6 +31,8 @@ if (process.env.NODE_ENV === "development") {
 
 // route files
 const bootcamps = require("./routes/bootcamps");
+
+app.use(errorHandler);
 
 // mount route files
 app.use("/api/v1/bootcamps", bootcamps);
