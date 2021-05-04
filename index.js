@@ -31,11 +31,13 @@ if (process.env.NODE_ENV === "development") {
 
 // route files
 const bootcamps = require("./routes/bootcamps");
+const courses = require("./routes/courses");
 
 app.use(errorHandler);
 
 // mount route files
 app.use("/api/v1/bootcamps", bootcamps);
+app.use("/api/v1/courses", courses);
 
 const PORT = process.env.PORT || 5000;
 
