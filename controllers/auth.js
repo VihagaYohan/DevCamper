@@ -1,6 +1,8 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const sendEmail = require("../utils/sendEmail");
+const sendTokenResponse = require("../utils/sendTokenResponse");
+const crypto = require("crypto");
 
 // @desc      register user
 // @route     POST/api/v1/auth/register
@@ -87,10 +89,14 @@ exports.forgotPassword = async (req, res, next) => {
       .json({ sucess: false, data: "There is no user with that email" });
 
   // get reset token
-  const resetToken = user.getResetPasswordToken();
+  let resetToken;
+  user.getResetPasswordToken().then((r) => {
+    resettoken = r;
+  });
 
   await user.save({ validateBeforeSave: false });
-  console.log(resetToken);
+  console.log("token goes below");
+  console.log(resetToken.PromiseResult);
 
   // create reset URL
   const resetUrl = `${req.protocol}://${req.get(
@@ -118,8 +124,39 @@ exports.forgotPassword = async (req, res, next) => {
     res.status(500).json({ sucess: false, data: "Email could not sent" });
   }
 
-/*   res.status(200).json({
+  /*   res.status(200).json({
     sucess: true,
     data: user,
   }); */
+};
+
+// @desc  reset password
+// @route PUT/api/v1/auth/resetpassword/:resettoken
+// @access Public
+exports.resetPassword = async (req, res, next) => {
+  // get hashed token
+  const resetPasswordToken = crypto
+    .createHash("sha256")
+    .update(req.params.resettoken)
+    .digest("hex");
+
+  const user = await Usser.findOne({
+    resetPasswordToken,
+    resetPasswordExpire: { $get: Date.now() },
+  });
+
+  if (!user)
+    return res.status(400).json({
+      sucess: false,
+      data: "Invalid token",
+    });
+
+  // set new password
+  user.password = req.body.password;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpire = undefined;
+
+  await user.save();
+
+  sendTokenResponse(user, 200, res);
 };
