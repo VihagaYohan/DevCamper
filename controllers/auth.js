@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const sendEmail = require("../utils/sendEmail");
 
 // @desc      register user
 // @route     POST/api/v1/auth/register
@@ -91,8 +92,34 @@ exports.forgotPassword = async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
   console.log(resetToken);
 
-  res.status(200).json({
+  // create reset URL
+  const resetUrl = `${req.protocol}://${req.get(
+    "host"
+  )}/api/v1/resetpassword/${resetToken}`;
+
+  const message = `You are receiving this email because you (or someone else) has requested the reset of a password. please make a PUT request to: \n\n ${resetUrl}`;
+
+  try {
+    await sendEmail({
+      email: user.email,
+      subject: "Password reset token",
+      message: message,
+    });
+
+    res.status(200).json({ sucess: true, data: "Email has been sent" });
+  } catch (error) {
+    console.log(error);
+
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+
+    await user.save({ validateBeforeSave: false });
+
+    res.status(500).json({ sucess: false, data: "Email could not sent" });
+  }
+
+/*   res.status(200).json({
     sucess: true,
     data: user,
-  });
+  }); */
 };
